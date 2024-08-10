@@ -29,6 +29,7 @@ namespace MG.Extensions.Strings.Builders
         /// <returns>
         /// <inheritdoc cref="Append(char)"/>
         /// </returns>
+        /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
         public SpanStringBuilder Append<T>(T number, ReadOnlySpan<char> format = default, IFormatProvider? provider = null) where T : INumber<T>, IMinMaxValue<T>
         {
             int length = number.GetLength();
@@ -79,6 +80,7 @@ namespace MG.Extensions.Strings.Builders
         /// <returns>
         /// This same <see cref="SpanStringBuilder"/> instance for chaining.
         /// </returns>
+        /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
         public SpanStringBuilder Append<T>(int length, T state, SpanAction<char, T> spanAction)
         {
             this.EnsureCapacity(length);
@@ -104,6 +106,7 @@ namespace MG.Extensions.Strings.Builders
         /// <returns>
         /// This same <see cref="SpanStringBuilder"/> instance for chaining.
         /// </returns>
+        /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
         public SpanStringBuilder Append<T>(int maxLength, T state, WriteToSpan<T> spanFunc)
         {
             this.EnsureCapacity(maxLength);

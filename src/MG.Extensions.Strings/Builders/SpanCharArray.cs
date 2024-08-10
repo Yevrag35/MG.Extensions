@@ -10,6 +10,7 @@ namespace MG.Extensions.Strings.Builders
     /// This struct should be disposed after use to release the rented memory.
     /// </remarks>
     [StructLayout(LayoutKind.Auto)]
+    [DebuggerDisplay("Count = {Count}")]
     public ref struct SpanCharArray
     {
         const int MULTIPLE = 16;
@@ -48,10 +49,32 @@ namespace MG.Extensions.Strings.Builders
                 return this.GetSegment(index);
             }
         }
+        /// <summary>
+        /// Gets the capacity of this <see cref="SpanCharArray"/> instance which is the number of
+        /// segments that can be added before a resize is required.
+        /// </summary>
         public readonly int Capacity => _positionArray?.Length ?? _positions.Length;
+        /// <summary>
+        /// Gets the number of segments added to this instance.
+        /// </summary>
         public readonly int Count => _index;
+        /// <summary>
+        /// Indicates whether this instance is using an <see cref="ArrayPool{T}"/> rented buffer.
+        /// </summary>
+        /// <remarks>
+        /// If this <see langword="true"/>, then this array needs to be disposed 
+        /// to return the buffer to the pool.
+        /// </remarks>
         public readonly bool IsRented => _isRented;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="SpanCharArray"/> with the minimum initial 
+        /// capacity and a separator character.
+        /// </summary>
+        /// <param name="minimumLength">
+        /// The minimum capacity for the internal buffer the array should allocate.
+        /// </param>
+        /// <param name="separator">The character separator that this array will join on.</param>
         public SpanCharArray(int minimumLength, char separator)
         {
             SpanPosition[] positionArray = ArrayPool<SpanPosition>.Shared.Rent(MULTIPLE);
@@ -182,6 +205,9 @@ namespace MG.Extensions.Strings.Builders
             this.Dispose();
             return result;
         }
+        /// <summary>
+        /// Disposes this <see cref="SpanCharArray"/> and returns the internal buffer to the pool.
+        /// </summary>
         public void Dispose()
         {
             bool isRented = this.IsRented;
@@ -195,70 +221,73 @@ namespace MG.Extensions.Strings.Builders
             }
         }
 
-        [DebuggerStepThrough]
-        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
-        public bool Remove(
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ReadOnlySpan<char> value)
-        {
-            return this.Remove(value, StringComparison.OrdinalIgnoreCase);
-        }
-        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
-        public bool Remove(
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ReadOnlySpan<char> value, StringComparison comparison)
-        {
-            bool removed = false;
-            int index = _index;
-            for (int i = 0; i < index; i++)
-            {
-                ref readonly SpanPosition pos = ref _positions[i];
-                if (_builder.GetSegment(pos.Index, pos.Length).Equals(value, comparison))
-                {
-                    this.RemoveAt(in i, in pos);
+        //TODO: Fix the Remove methods
 
-                    removed = true;
-                    break;
-                }
-            }
+        //        [DebuggerStepThrough]
+        //        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
+        //        public bool Remove(
+        //#if NET7_0_OR_GREATER
+        //            scoped
+        //#endif
+        //            ReadOnlySpan<char> value)
+        //        {
+        //            return this.Remove(value, StringComparison.OrdinalIgnoreCase);
+        //        }
+        //        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
+        //        public bool Remove(
+        //#if NET7_0_OR_GREATER
+        //            scoped
+        //#endif
+        //            ReadOnlySpan<char> value, StringComparison comparison)
+        //        {
+        //            bool removed = false;
+        //            int index = _index;
+        //            for (int i = 0; i < index; i++)
+        //            {
+        //                ref readonly SpanPosition pos = ref _positions[i];
+        //                if (_builder.GetSegment(pos.Index, pos.Length).Equals(value, comparison))
+        //                {
+        //                    this.RemoveAt(in i, in pos);
 
-            return removed;
-        }
-        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
-        public void RemoveAt(int index)
-        {
-            ref readonly SpanPosition pos = ref _positions[index];
-            this.RemoveAt(in index, in pos);
-        }
-        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
-        private void RemoveAt(in int index, in SpanPosition pos)
-        {
-            if (pos.Index + pos.Length < _builder.Length)
-            {
-                _builder = _builder.Remove(pos.Index, pos.Length + 1); // 1 for the space
-            }
-            else
-            {
-                _builder = _builder.Remove(pos.Index, pos.Length);
-            }
+        //                    removed = true;
+        //                    break;
+        //                }
+        //            }
 
-            Span<SpanPosition> allPos = _positions;
-            Span<SpanPosition> posAtIndex = allPos.Slice(index);
-            int minusOne = posAtIndex.Length - 1;
+        //            return removed;
+        //        }
+        //        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
+        //        public void RemoveAt(int index)
+        //        {
+        //            ref readonly SpanPosition pos = ref _positions[index];
+        //            this.RemoveAt(in index, in pos);
+        //        }
+        //        [Obsolete("A bug exists in the 'Remove' methods.", error: true)]
+        //        private void RemoveAt(in int index, in SpanPosition pos)
+        //        {
+        //            if (pos.Index + pos.Length < _builder.Length)
+        //            {
+        //                _builder = _builder.Remove(pos.Index, pos.Length + 1); // 1 for the space
+        //            }
+        //            else
+        //            {
+        //                _builder = _builder.Remove(pos.Index, pos.Length);
+        //            }
 
-            for (int i = 0; i < posAtIndex.Length; i++)
-            {
-                posAtIndex[i] = i < minusOne
-                    ? posAtIndex[i + 1].ShiftLeft(pos.Length)
-                    : default;
-            }
+        //            Span<SpanPosition> allPos = _positions;
+        //            Span<SpanPosition> posAtIndex = allPos.Slice(index);
+        //            int minusOne = posAtIndex.Length - 1;
 
-            _positions = allPos.Slice(0, allPos.Length - 1);
-        }
+        //            for (int i = 0; i < posAtIndex.Length; i++)
+        //            {
+        //                posAtIndex[i] = i < minusOne
+        //                    ? posAtIndex[i + 1].ShiftLeft(pos.Length)
+        //                    : default;
+        //            }
+
+        //            _positions = allPos.Slice(0, allPos.Length - 1);
+        //        }
+        
         /// <summary>
         /// Allocates a new <see cref="string"/> from the character spans added to this <see cref="SpanCharArray"/>.
         /// </summary>

@@ -6,10 +6,49 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyName>MG.Extensions.Strings</AssemblyName>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<FileVersion>1.0.0</FileVersion>
+		<InformationalVersion>1.0.0</InformationalVersion>
+		<Version>1.0.0</Version>
+		<Title>MG String Extensions</Title>
+		<Authors>Mike Garvey</Authors>
+		<Company>Yevrag35, LLC.</Company>
+		<Copyright>Copyright (c) 2024 Yevrag35, LLC., Mike Garvey, and Contributors. All rights reserved.</Copyright>
+		<Description>Providing String/Span-based extension methods.</Description>
+		<RepositoryUrl>https://github.com/Yevrag35/MG.Extensions.git</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
+		<PackageId>MG.Extensions.Strings</PackageId>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/Yevrag35/MG.Extensions</PackageProjectUrl>
+		<PackageReadmeFile>docs\README.md</PackageReadmeFile>
+		<PackageTags>String;Span;Char;Character;Extension;Builder</PackageTags>
+	</PropertyGroup>
 	
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+	  <AssemblyTitle>MG String Extensions - .NET 8</AssemblyTitle>
+	  <Product>MG String Extensions - .NET 8</Product>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+	  <AssemblyTitle>MG String Extensions - .NET 7</AssemblyTitle>
+	  <Product>MG String Extensions - .NET 7</Product>
+  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<AssemblyTitle>MG String Extensions - .NET 6</AssemblyTitle>
+		<Product>MG String Extensions - .NET 6</Product>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<AssemblyTitle>MG String Extensions - .NET Standard 2.0</AssemblyTitle>
+		<Product>MG String Extensions - .NET Standard 2.0</Product>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+		<AssemblyTitle>MG String Extensions - .NET Standard 2.1</AssemblyTitle>
+		<Product>MG String Extensions - .NET Standard 2.1</Product>
+	</PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
 	  <LangVersion>10</LangVersion>
-	  
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0'">
 	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -35,6 +74,11 @@
 	  <Using Include="System.Diagnostics.CodeAnalysis" />
 	  <Using Include="System.Globalization" />
 	  <Using Include="System.Text" />
+  </ItemGroup>
+	
+  <ItemGroup>
+	  <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" Link="..\.pkg\LICENSE.txt" />
+	  <None Include="README.md" Pack="true" PackagePath="docs\" Link="..\.pkg\README.md" />
   </ItemGroup>
 
 </Project>

@@ -19,6 +19,8 @@ namespace MG.Extensions.Strings.Benchmarks
                 _ = x.Append(s);
             }
 
+
+
             //_ = x.ToString();
         }
 

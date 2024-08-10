@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace MG.Extensions.Strings.Enumerators
 {
     /// <summary>
@@ -5,6 +7,8 @@ namespace MG.Extensions.Strings.Enumerators
     /// the separator itself.
     /// </summary>
     [DebuggerStepThrough]
+    [StructLayout(LayoutKind.Auto)]
+    [DebuggerDisplay(@"\{{Chars}\}")]
     public readonly ref struct SplitEntry
     {
         /// <summary>
@@ -38,6 +42,9 @@ namespace MG.Extensions.Strings.Enumerators
             separator = Separator;
         }
 
+        /// <summary>
+        /// An empty <see cref="SplitEntry"/> instance with empty character and separator spans.
+        /// </summary>
         public static SplitEntry Empty => new SplitEntry(ReadOnlySpan<char>.Empty, ReadOnlySpan<char>.Empty);
 
         /// <summary>

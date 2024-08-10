@@ -1,9 +1,14 @@
 using MG.Extensions.Guarding;
+using System.Runtime.InteropServices;
 
 #pragma warning disable IDE0009 // Member access should be qualified.
 namespace MG.Extensions.Strings
 {
+    /// <summary>
+    /// A struct that represents a numerical range of characters.
+    /// </summary>
     [DebuggerStepThrough]
+    [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay(@"[{Start}..{End}]")]
     public ref struct CharRange
     {
@@ -14,7 +19,13 @@ namespace MG.Extensions.Strings
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _length;
 
+        /// <summary>
+        /// Gets the count of characters that the range represents.
+        /// </summary>
         public readonly int Length => _length;
+        /// <summary>
+        /// Gets the inclusive starting character.
+        /// </summary>
         public char Start
         {
             readonly get => _start;
@@ -31,6 +42,9 @@ namespace MG.Extensions.Strings
                 _length = GetLength(in value, in _end);
             }
         }
+        /// <summary>
+        /// Gets the inclusive ending character.
+        /// </summary>
         public char End
         {
             readonly get => _end;
@@ -47,6 +61,12 @@ namespace MG.Extensions.Strings
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="CharRange"/> using the specified starting and ending 
+        /// characters.
+        /// </summary>
+        /// <param name="start">The starting character of the range.</param>
+        /// <param name="end">The ending character of the range.</param>
         /// <inheritdoc cref="ValidateRange(in char, in char)" path="/exception"/>
         public CharRange(char start, char end)
         {
@@ -56,6 +76,10 @@ namespace MG.Extensions.Strings
             _length = GetLength(in start, in end);
         }
 
+        /// <summary>
+        /// Copies this range of characters to the specified span.
+        /// </summary>
+        /// <param name="span">The span to copy the range of characters into.</param>
         public readonly void CopyTo(
 #if NET7_0_OR_GREATER
             scoped 
@@ -72,6 +96,12 @@ namespace MG.Extensions.Strings
                 span[i] = (char)(start + i);
             }
         }
+        /// <summary>
+        /// Copies this range of characters to the specified span and updates the specified index
+        /// with the length of the range.
+        /// </summary>
+        /// <param name="span">The span to copy the range of characters into.</param>
+        /// <param name="index">The index to update.</param>
         public readonly void CopyTo(
 #if NET7_0_OR_GREATER
             scoped 
@@ -85,6 +115,11 @@ namespace MG.Extensions.Strings
         {
             return end - start + 1;
         }
+        /// <summary>
+        /// Allocates a new array of <see cref="char"/> elements that contain the 
+        /// characters represented by this range.
+        /// </summary>
+        /// <returns></returns>
         public readonly char[] ToArray()
         {
             char[] array = new char[this.Length];
@@ -102,6 +137,11 @@ namespace MG.Extensions.Strings
 #endif
         }
 
+        /// <summary>
+        /// Implicitly converts a <see cref="CharRange"/> to a <see cref="ReadOnlySpan{T}"/> of 
+        /// <see cref="char"/>.
+        /// </summary>
+        /// <param name="span">The span that is being converted.</param>
         public static implicit operator CharRange(Span<char> span)
         {
             Guard.ThrowIfLessThan(span.Length, 2, nameof(span));

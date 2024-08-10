@@ -8,6 +8,7 @@ namespace MG.Extensions.Strings.Enumerators
     /// based on specified separator characters.
     /// </summary>
     [DebuggerStepThrough]
+    [StructLayout(LayoutKind.Auto)]
     public ref struct SplitEnumerator
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -1,5 +1,9 @@
 namespace MG.Extensions.Strings
 {
+    /// <summary>
+    /// A <see langword="static"/> class containing constants for the maximum character lengths of various 
+    /// numerical types.
+    /// </summary>
     public static class LengthConstants
     {
         // NUMERICAL LENGTHS

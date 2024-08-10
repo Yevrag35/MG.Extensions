@@ -87,6 +87,13 @@ namespace MG.Extensions.Strings.Builders
             _builder = new(minimumLength);
         }
 
+        /// <summary>
+        /// Adds the specified read-only span to end of this <see cref="SpanCharArray"/>.
+        /// </summary>
+        /// <param name="value">The segment to add.</param>
+        /// <returns>
+        /// This same <see cref="SpanCharArray"/> instance for chaining.
+        /// </returns>
         [DebuggerStepThrough]
         public SpanCharArray Add(
 #if NET7_0_OR_GREATER
@@ -99,6 +106,16 @@ namespace MG.Extensions.Strings.Builders
             this.AddSegment(value);
             return this;
         }
+
+        /// <summary>
+        /// Splits the specified read-only span of characters by the specified separator and adds each 
+        /// segment to the end of this <see cref="SpanCharArray"/>.
+        /// </summary>
+        /// <param name="value">The read-only span to split and add.</param>
+        /// <param name="splitBy">The span of characters to split <paramref name="value"/> by.</param>
+        /// <returns>
+        /// This same <see cref="SpanCharArray"/> instance for chaining.
+        /// </returns>
         public SpanCharArray AddRange(
             #if NET7_0_OR_GREATER
             scoped
@@ -156,11 +173,26 @@ namespace MG.Extensions.Strings.Builders
 #endif
         }
 
+        /// <summary>
+        /// Returns the segments added to this <see cref="SpanCharArray"/> after being
+        /// joined by the separator character.
+        /// </summary>
+        /// <returns>
+        /// The joined segments as a read-only span.
+        /// </returns>
         public readonly ReadOnlySpan<char> AsSpan()
         {
             return _builder.AsSpan();
         }
 
+        /// <summary>
+        /// Determines whether this <see cref="SpanCharArray"/> contains the specified segment value.
+        /// </summary>
+        /// <param name="value">The segment to search for.</param>
+        /// <returns>
+        /// <see langword="true"/> if the <paramref name="value"/> is found;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         [DebuggerStepThrough]
         public readonly bool Contains(
 #if NET7_0_OR_GREATER
@@ -170,6 +202,16 @@ namespace MG.Extensions.Strings.Builders
         {
             return this.Contains(value, StringComparison.OrdinalIgnoreCase);
         }
+        /// <summary>
+        /// Determines whether this <see cref="SpanCharArray"/> contains the specified segment value
+        /// using the specified comparison type for equality.
+        /// </summary>
+        /// <param name="value">The segment to search for.</param>
+        /// <param name="comparison">The character comparison type to use.</param>
+        /// <returns>
+        /// <see langword="true"/> if the <paramref name="value"/> is found;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         public readonly bool Contains(
 #if NET7_0_OR_GREATER
             scoped
@@ -300,6 +342,15 @@ namespace MG.Extensions.Strings.Builders
             return _builder.ToString();
         }
 
+        /// <summary>
+        /// Splits the specified read-only span of characters by the specified separator character and
+        /// returns a new <see cref="SpanCharArray"/> instance with the segments added.
+        /// </summary>
+        /// <param name="value">The value to split.</param>
+        /// <param name="separator">The character to split <paramref name="value"/> by.</param>
+        /// <returns>
+        /// A new <see cref="SpanCharArray"/> instance with the split segments added.
+        /// </returns>
         public static SpanCharArray Split(
 #if NET7_0_OR_GREATER
             scoped

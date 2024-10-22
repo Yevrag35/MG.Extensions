@@ -82,6 +82,12 @@ dotnet_style_readonly_field = true
 # Parameter preferences
 dotnet_code_quality_unused_parameters = non_public
 
+# Using directive is unnecessary.
+dotnet_diagnostic.IDE0005.severity = suggestion
+
+# Remove unnecessary suppression
+dotnet_diagnostic.IDE0079.severity = none
+
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none
 
@@ -119,7 +125,8 @@ csharp_style_conditional_delegate_call = true
 
 # Modifier preferences
 csharp_prefer_static_local_function = true
-csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
+# Modifier preferences
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:error
 csharp_style_prefer_readonly_struct = true
 csharp_style_prefer_readonly_struct_member = true
 
@@ -128,7 +135,7 @@ csharp_prefer_braces = true:suggestion
 csharp_prefer_simple_using_statement = true:silent
 csharp_style_namespace_declarations = block_scoped:silent
 csharp_style_prefer_method_group_conversion = true:silent
-csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_primary_constructors = false:warning
 csharp_style_prefer_top_level_statements = false:silent
 
 # Expression-level preferences
@@ -264,3 +271,12 @@ dotnet_style_prefer_inferred_tuple_names = true:warning
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_simplified_interpolation = true:suggestion
+
+# Report public classes without inheritors (default: false)
+MA0053.public_class_should_be_sealed = true
+
+# Report class without inheritors even if there is virtual members (default: false)
+MA0053.class_with_virtual_member_shoud_be_sealed = true
+
+dotnet_diagnostic.MA0048.severity = none
+dotnet_diagnostic.MA0053.severity = suggestion

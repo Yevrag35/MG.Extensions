@@ -1,4 +1,7 @@
 using MG.Extensions.Guarding;
+#if NET9_0_OR_GREATER
+using System.Collections;
+#endif
 using System.Runtime.InteropServices;
 
 #pragma warning disable IDE0009 // Member access should be qualified.
@@ -11,6 +14,9 @@ namespace MG.Extensions.Strings
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay(@"[{Start}..{End}]")]
     public ref struct CharRange
+#if NET9_0_OR_GREATER
+        : IEnumerable<char>
+#endif
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private char _start;
@@ -51,13 +57,11 @@ namespace MG.Extensions.Strings
             set
             {
                 Guard.ThrowIfLessThan(value, _start, nameof(End));
-                if (value == _end)
+                if (value != _end)
                 {
-                    return;
+                    _end = value;
+                    _length = GetLength(in _start, in value);
                 }
-
-                _end = value;
-                _length = GetLength(in _start, in value);
             }
         }
 
@@ -91,7 +95,7 @@ namespace MG.Extensions.Strings
 
             int start = this.Start;
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; (uint)i < (uint)length; i++)
             {
                 span[i] = (char)(start + i);
             }
@@ -104,13 +108,14 @@ namespace MG.Extensions.Strings
         /// <param name="index">The index to update.</param>
         public readonly void CopyTo(
 #if NET7_0_OR_GREATER
-            scoped 
+            scoped
 #endif
             Span<char> span, ref int index)
         {
             this.CopyTo(span.Slice(index));
             index += this.Length;
         }
+
         private static int GetLength(in char start, in char end)
         {
             return end - start + 1;
@@ -150,6 +155,57 @@ namespace MG.Extensions.Strings
 
             return end < start ? new CharRange(end, start) : new CharRange(start, end);
         }
+
+#if NET9_0_OR_GREATER
+        public readonly IEnumerator<char> GetEnumerator()
+        {
+            return new Enumerator(_start, _end);
+        }
+        readonly IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        private struct Enumerator : IEnumerator<char>
+        {
+            private int _current;
+            private int _start;
+            private int _end;
+
+            public readonly char Current => (char)_current;
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            readonly object IEnumerator.Current => this.Current;
+
+            internal Enumerator(int start, int end)
+            {
+                int starting = start - 1;
+                _start = starting;
+                _current = starting;
+                _end = end;
+            }
+
+            public void Dispose()
+            {
+                this = default;
+            }
+            public bool MoveNext()
+            {
+                int next = _current + 1;
+                if ((uint)next > (uint)_end)
+                {
+                    return false;
+                }
+
+                _current = next;
+                return true;
+            }
+            public void Reset()
+            {
+                _current = _start;
+            }
+        }
+
+#endif
     }
 }
 #pragma warning restore IDE0009 // Member access should be qualified.

@@ -1,4 +1,5 @@
 using MG.Extensions.Strings.Enumerators;
+using System.Collections.Generic;
 
 namespace MG.Extensions.Strings
 {
@@ -69,7 +70,7 @@ namespace MG.Extensions.Strings
         /// <summary>
         /// Splits the string based on a sequence of separator characters.
         /// </summary>
-        /// <param name="value">
+        /// <param name="span">
         ///     The string to split. A <see langword="null"/> string is treated as an 
         ///     empty span.
         /// </param>
@@ -81,13 +82,39 @@ namespace MG.Extensions.Strings
             return new SplitEnumerator(str: span, splitBy);
         }
 
-        //public static SplitAnyEnumerator SpanSplitAny(this ReadOnlySpan<char> chars, ReadOnlySpan<char> splitByAny)
-        //{
-        //    return new SplitAnyEnumerator(chars, splitByAny);
-        //}
-        //public static SplitAnyEnumerator SpanSplitAny(this string? value, ReadOnlySpan<char> splitByAny)
-        //{
-        //    return new SplitAnyEnumerator(value.AsSpan(), splitByAny);
-        //}
+#if NET8_0_OR_GREATER
+        public static SplitAnyEnumerator SpanSplitAny(this ReadOnlySpan<char> readOnlySpan, SearchValues<char> searchValues)
+        {
+            return new SplitAnyEnumerator(readOnlySpan, searchValues);
+        }
+        [DebuggerStepThrough]
+        public static SplitAnyEnumerator SpanSplitAny(this Span<char> span, SearchValues<char> searchValues)
+        {
+            return SpanSplitAny(readOnlySpan: span, searchValues);
+        }
+        [DebuggerStepThrough]
+        public static SplitAnyEnumerator SpanSplitAny(this string? value, SearchValues<char> searchValues)
+        {
+            return SpanSplitAny(readOnlySpan: value.AsSpan(), searchValues);
+        }
+
+#if NET9_0_OR_GREATER
+        public static SplitAnyStringEnumerator SpanSplitAny(this ReadOnlySpan<char> readOnlySpan, SearchValues<string> searchValues)
+        {
+            return new SplitAnyStringEnumerator(readOnlySpan, searchValues);
+        }
+        [DebuggerStepThrough]
+        public static SplitAnyStringEnumerator SpanSplitAny(this Span<char> span, SearchValues<string> searchValues)
+        {
+            return SpanSplitAny(readOnlySpan: span, searchValues);
+        }
+        [DebuggerStepThrough]
+        public static SplitAnyStringEnumerator SpanSplitAny(this string? value, SearchValues<string> searchValues)
+        {
+            return SpanSplitAny(readOnlySpan: value.AsSpan(), searchValues);
+        }
+#endif
+
+#endif
     }
 }

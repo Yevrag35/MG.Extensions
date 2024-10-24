@@ -30,6 +30,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<AssemblyTitle>MG String Extensions - .NET 9</AssemblyTitle>
 		<Product>MG String Extensions - .NET 9</Product>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<AssemblyTitle>MG String Extensions - .NET 8</AssemblyTitle>
@@ -77,6 +78,7 @@
 		<Using Include="System.Diagnostics" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="System.Globalization" />
+		<Using Include="System.Runtime.CompilerServices" />
 		<Using Include="System.Text" />
 	</ItemGroup>
 

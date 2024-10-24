@@ -28,6 +28,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<AssemblyTitle>MG Guarding - .NET 9</AssemblyTitle>
 		<Product>MG Guarding - .NET 9</Product>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 	  <AssemblyTitle>MG Guarding - .NET 8</AssemblyTitle>

@@ -16,7 +16,7 @@ namespace MG.Extensions.Strings.Enumerators
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly ReadOnlySpan<char> _splitBy;
 
-        private ReadOnlySpan<char> _str;
+        private ReadOnlySpan<char> _remainingText;
 
         /// <summary>
         /// Gets the current <see cref="SplitEntry"/> in the enumeration.
@@ -30,12 +30,21 @@ namespace MG.Extensions.Strings.Enumerators
         /// <summary>
         /// Initializes a new instance of the <see cref="SplitEnumerator"/> struct.
         /// </summary>
-        /// <param name="str">The string/span to split.</param>
+        /// <param name="text">The string/span to split.</param>
+        /// <param name="splitBy">The character to use as a separator for splitting.</param>
+        public SplitEnumerator(ReadOnlySpan<char> text, in char splitBy)
+            : this(text, splitBy: FromOneChar(in splitBy))
+        {
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SplitEnumerator"/> struct.
+        /// </summary>
+        /// <param name="text">The string/span to split.</param>
         /// <param name="splitBy">The characters to use as a separator for splitting.</param>
-        public SplitEnumerator(ReadOnlySpan<char> str, ReadOnlySpan<char> splitBy)
+        public SplitEnumerator(ReadOnlySpan<char> text, ReadOnlySpan<char> splitBy)
         {
             _current = SplitEntry.Empty;
-            _str = str;
+            _remainingText = text;
             _splitBy = splitBy;
         }
 
@@ -54,8 +63,8 @@ namespace MG.Extensions.Strings.Enumerators
         /// </returns>
         public bool MoveNext()
         {
-            ReadOnlySpan<char> span = _str;
-            if (span.Length <= 0)
+            ReadOnlySpan<char> span = _remainingText;
+            if (span.IsEmpty)
             {
                 return false;
             }
@@ -63,13 +72,15 @@ namespace MG.Extensions.Strings.Enumerators
             int index = span.IndexOf(_splitBy);
             if (index < 0)
             {
-                _str = ReadOnlySpan<char>.Empty;
+                _remainingText = ReadOnlySpan<char>.Empty;
                 _current = new SplitEntry(span, _splitBy);
-                return true;
+            }
+            else
+            {
+                _current = new SplitEntry(span.Slice(0, index), span.Slice(index, _splitBy.Length));
+                _remainingText = span.Slice(index + _splitBy.Length);
             }
 
-            _current = new SplitEntry(span.Slice(0, index), span.Slice(index, _splitBy.Length));
-            _str = span.Slice(index + _splitBy.Length);
             return true;
         }
 

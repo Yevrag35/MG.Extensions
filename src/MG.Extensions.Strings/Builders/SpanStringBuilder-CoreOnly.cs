@@ -30,7 +30,8 @@ namespace MG.Extensions.Strings.Builders
         /// <inheritdoc cref="Append(char)"/>
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder Append<T>(T number, ReadOnlySpan<char> format = default, IFormatProvider? provider = null) where T : INumber<T>, IMinMaxValue<T>
+        public SpanStringBuilder Append<T>(T number, ReadOnlySpan<char> format = default, IFormatProvider? provider = null) 
+            where T : INumber<T>, IMinMaxValue<T>
         {
             int length = number.GetLength();
             this.EnsureCapacity(length);

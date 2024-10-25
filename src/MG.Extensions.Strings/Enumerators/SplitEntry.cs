@@ -55,4 +55,3 @@ namespace MG.Extensions.Strings.Enumerators
         public static implicit operator ReadOnlySpan<char>(SplitEntry entry) => entry.Chars;
     }
 }
-

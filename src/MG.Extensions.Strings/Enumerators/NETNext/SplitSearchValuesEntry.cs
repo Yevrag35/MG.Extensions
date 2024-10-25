@@ -1,5 +1,4 @@
-﻿#if NET8_0_OR_GREATER
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace MG.Extensions.Strings.Enumerators
 {
@@ -8,21 +7,32 @@ namespace MG.Extensions.Strings.Enumerators
         private static readonly Lazy<SearchValues<char>> s_lazySearchChars = new(() => SearchValues.Create(ReadOnlySpan<char>.Empty));
         internal static SearchValues<char> GetEmpty() => s_lazySearchChars.Value;
 
-        public static SplitSearchValuesEntry<char> EmptyCharEntry => new([], GetEmpty());
+        internal static SplitSearchValuesEntry<char> EmptyCharEntry => new([], GetEmpty());
 
 #if NET9_0_OR_GREATER
         private static readonly Lazy<SearchValues<string>> s_lazySearchStrs = new(() => SearchValues.Create([], StringComparison.Ordinal));
 
         internal static SearchValues<string> GetEmptyStrings() => s_lazySearchStrs.Value;
-        public static SplitSearchValuesEntry<string> EmptyStringEntry => new([], GetEmptyStrings());
+        internal static SplitSearchValuesEntry<string> EmptyStringEntry => new([], GetEmptyStrings());
 #endif
     }
 
+    /// <summary>
+    /// A read-only ref struct that represents a section of a string and the <see cref="SearchValues{T}"/> instance that it was 
+    /// split by.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay(@"\{{Section}\}")]
     public readonly ref struct SplitSearchValuesEntry<T> where T : IEquatable<T>
     {
+        /// <summary>
+        /// The section of the string/span of characters that was split.
+        /// </summary>
         public readonly ReadOnlySpan<char> Section;
+        /// <summary>
+        /// Gets the <see cref="SearchValues{T}"/> instance that was used to split the section.
+        /// </summary>
         public readonly SearchValues<T> SplitBy { get; }
 
         internal SplitSearchValuesEntry(ReadOnlySpan<char> section, SearchValues<T> searchValues)
@@ -42,4 +52,3 @@ namespace MG.Extensions.Strings.Enumerators
         }
     }
 }
-#endif

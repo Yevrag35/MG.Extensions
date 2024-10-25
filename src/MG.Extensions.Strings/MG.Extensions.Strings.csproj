@@ -55,9 +55,17 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
 		<LangVersion>10</LangVersion>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0'">
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">
+		<Compile Remove="**\NETNext\**\*.cs" />
+		<None Include="**\NETNext\**\*.cs" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\MG.Extensions.Guarding\MG.Extensions.Guarding.csproj" />

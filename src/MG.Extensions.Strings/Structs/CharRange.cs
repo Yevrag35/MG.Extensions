@@ -39,13 +39,11 @@ namespace MG.Extensions.Strings
             {
                 Guard.ThrowIfGreaterThan(value, _end, nameof(Start));
 
-                if (value == _start)
+                if (value != _start)
                 {
-                    return;
+                    _start = value;
+                    _length = GetLength(in value, in _end);
                 }
-
-                _start = value;
-                _length = GetLength(in value, in _end);
             }
         }
         /// <summary>
@@ -157,10 +155,17 @@ namespace MG.Extensions.Strings
         }
 
 #if NET9_0_OR_GREATER
+        /// <summary>
+        /// Gets an enumerator that iterates through the characters in the range.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that iterates through the characters in the range in ascending numerical order.
+        /// </returns>
         public readonly IEnumerator<char> GetEnumerator()
         {
             return new Enumerator(_start, _end);
         }
+        /// <inheritdoc/>
         readonly IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();

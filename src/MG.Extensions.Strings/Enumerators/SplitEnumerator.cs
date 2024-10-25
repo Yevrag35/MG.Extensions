@@ -63,25 +63,39 @@ namespace MG.Extensions.Strings.Enumerators
         /// </returns>
         public bool MoveNext()
         {
-            ReadOnlySpan<char> span = _remainingText;
-            if (span.IsEmpty)
+            ReadOnlySpan<char> chars = _remainingText;
+            bool hasNext = chars.IsEmpty;
+
+            if (!hasNext)
             {
-                return false;
+                hasNext = FindIndexAndSplit(chars, _splitBy, ref _remainingText, ref _current);
             }
 
-            int index = span.IndexOf(_splitBy);
-            if (index < 0)
+            return hasNext;
+        }
+
+        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, ReadOnlySpan<char> splitBy, ref ReadOnlySpan<char> remainingText, ref SplitEntry current)
+        {
+            bool hasNext;
+            int index = chars.IndexOfAny(splitBy);
+            if (index == -1)
             {
-                _remainingText = ReadOnlySpan<char>.Empty;
-                _current = new SplitEntry(span, _splitBy);
+                remainingText = ReadOnlySpan<char>.Empty;
+                current = new(chars, splitBy);
+                hasNext = false;
             }
             else
             {
-                _current = new SplitEntry(span.Slice(0, index), span.Slice(index, _splitBy.Length));
-                _remainingText = span.Slice(index + _splitBy.Length);
+                current = new(chars.Slice(0, index), splitBy);
+
+                remainingText = (uint)index + 1u < (uint)chars.Length
+                    ? chars.Slice(index + 1)
+                    : ReadOnlySpan<char>.Empty;
+
+                hasNext = true;
             }
 
-            return true;
+            return hasNext;
         }
 
         internal static ReadOnlySpan<char> FromOneChar(in char value)

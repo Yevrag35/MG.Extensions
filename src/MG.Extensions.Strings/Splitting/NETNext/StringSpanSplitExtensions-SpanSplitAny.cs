@@ -4,6 +4,12 @@ namespace MG.Extensions.Strings
 {
     public static partial class StringSpanSplitExtensions
     {
+        /// <summary>
+        /// Splits the read-only span of characters based on any of the specified separator in the provided <see cref="SearchValues"/>.
+        /// </summary>
+        /// <param name="readOnlySpan"></param>
+        /// <param name="searchValues"></param>
+        /// <returns></returns>
         public static SplitAnyEnumerator SpanSplitAny(this ReadOnlySpan<char> readOnlySpan, SearchValues<char> searchValues)
         {
             return new SplitAnyEnumerator(readOnlySpan, searchValues);

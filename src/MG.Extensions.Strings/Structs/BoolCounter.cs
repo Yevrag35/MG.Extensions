@@ -5,7 +5,9 @@ namespace MG.Extensions.Strings
     /// <summary>
     /// A ref struct that keeps track of the number of <see langword="true"/> boolean values that have been set.
     /// </summary>
+    [DebuggerStepThrough]
     [StructLayout(LayoutKind.Auto)]
+    [DebuggerDisplay(@"\{Counted = {Count}\}")]
     public ref struct BoolCounter
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

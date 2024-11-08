@@ -14,7 +14,11 @@ namespace MG.Extensions.Strings.Builders
     /// <returns>
     /// The number of characters written to <paramref name="span"/>.
     /// </returns>
-    public delegate int WriteToSpan<T>(Span<char> span, T state);
+    public delegate int WriteToSpan<T>(Span<char> span, T state)
+#if NET9_0_OR_GREATER
+        where T : allows ref struct
+#endif
+        ;
 
     public ref partial struct SpanStringBuilder
     {
@@ -52,12 +56,8 @@ namespace MG.Extensions.Strings.Builders
         /// <inheritdoc cref="Append(char)"/>
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder Append<T>(T formattable, int maxLength,
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ReadOnlySpan<char> format = default,
-            IFormatProvider? provider = null) where T : ISpanFormattable
+        public SpanStringBuilder Append<T>(T formattable, int maxLength, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+            where T : ISpanFormattable
         {
             this.EnsureCapacity(maxLength);
             formattable.CopyToSlice(_span, ref _position, format, provider);

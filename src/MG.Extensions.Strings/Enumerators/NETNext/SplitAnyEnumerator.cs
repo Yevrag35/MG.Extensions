@@ -17,6 +17,7 @@ namespace MG.Extensions.Strings.Enumerators
         private readonly SearchValues<char> _splitBy;
 
         private readonly ReadOnlySpan<char> _original;
+        private readonly int _originalLength;
         private ReadOnlySpan<char> _remainingText;
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace MG.Extensions.Strings.Enumerators
         {
             _remainingText = text;
             _original = text;
+            _originalLength = text.Length;
             _splitBy = splitBy;
             _current = SplitSearchValuesEntry.EmptyCharEntry;
         }
@@ -63,7 +65,7 @@ namespace MG.Extensions.Strings.Enumerators
 
             if (!hasNext)
             {
-                hasNext = FindIndexAndSplit(chars, this.SplitBy, ref _remainingText, ref _current);
+                hasNext = FindIndexAndSplit(chars, in _originalLength, this.SplitBy, ref _remainingText, ref _current);
             }
 
             return hasNext;
@@ -78,19 +80,23 @@ namespace MG.Extensions.Strings.Enumerators
             _current = SplitSearchValuesEntry.EmptyCharEntry;
         }
 
-        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, SearchValues<char> splitBy, ref ReadOnlySpan<char> remainingText, ref SplitSearchValuesEntry<char> current)
+        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, in int originalLength, SearchValues<char> splitBy, ref ReadOnlySpan<char> remainingText, ref SplitSearchValuesEntry<char> current)
         {
-            bool hasNext;
+            int startAt = originalLength - chars.Length;
             int index = chars.IndexOfAny(splitBy);
+
+            bool hasNext;
             if (index == -1)
             {
+                Range range = Range.StartAt(startAt);
                 remainingText = [];
-                current = new(chars, splitBy);
+                current = new(range, chars, splitBy);
                 hasNext = false;
             }
             else
             {
-                current = new(chars.Slice(0, index), splitBy);
+                Range range = new(startAt, startAt + index + 1);
+                current = new(range, chars.Slice(0, index), splitBy);
 
                 remainingText = (uint)index + 1u < (uint)chars.Length
                     ? chars.Slice(index + 1)
@@ -117,7 +123,8 @@ namespace MG.Extensions.Strings.Enumerators
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private SearchValues<string>? _splitBy;
 
-        private ReadOnlySpan<char> _original;
+        private readonly ReadOnlySpan<char> _original;
+        private readonly int _originalLength;
         private ReadOnlySpan<char> _remainingText;
 
         /// <summary>
@@ -175,7 +182,7 @@ namespace MG.Extensions.Strings.Enumerators
 
             if (!hasNext)
             {
-                hasNext = FindIndexAndSplit(chars, this.SplitBy, ref _remainingText, ref _current);
+                hasNext = FindIndexAndSplit(chars, in _originalLength, this.SplitBy, ref _remainingText, ref _current);
             }
 
             return hasNext;
@@ -190,19 +197,23 @@ namespace MG.Extensions.Strings.Enumerators
             _current = SplitSearchValuesEntry.EmptyStringEntry;
         }
 
-        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, SearchValues<string> splitBy, ref ReadOnlySpan<char> remainingText, ref SplitSearchValuesEntry<string> current)
+        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, in int originalLength, SearchValues<string> splitBy, ref ReadOnlySpan<char> remainingText, ref SplitSearchValuesEntry<string> current)
         {
-            bool hasNext;
+            int startAt = originalLength - chars.Length;
             int index = chars.IndexOfAny(splitBy);
+
+            bool hasNext;
             if (index == -1)
             {
+                Range range = Range.StartAt(startAt);
                 remainingText = [];
-                current = new(chars, splitBy);
+                current = new(range, chars, splitBy);
                 hasNext = false;
             }
             else
             {
-                current = new(chars.Slice(0, index), splitBy);
+                Range range = new(startAt, startAt + index + 1);
+                current = new(range, chars.Slice(0, index), splitBy);
 
                 remainingText = (uint)index + 1u < (uint)chars.Length
                     ? chars.Slice(index + 1)

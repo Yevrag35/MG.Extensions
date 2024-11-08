@@ -275,6 +275,9 @@ dotnet_style_prefer_simplified_interpolation = true:suggestion
 # Report public classes without inheritors (default: false)
 MA0053.public_class_should_be_sealed = true
 
+# Use a single return
+dotnet_diagnostic.MEN007.severity = none
+
 # Report class without inheritors even if there is virtual members (default: false)
 MA0053.class_with_virtual_member_shoud_be_sealed = true
 

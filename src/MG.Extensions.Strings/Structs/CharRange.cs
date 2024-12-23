@@ -14,9 +14,6 @@ namespace MG.Extensions.Strings
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay(@"[{Start}..{End}]")]
     public ref struct CharRange
-#if NET9_0_OR_GREATER
-        : IEnumerable<char>
-#endif
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private char _start;
@@ -156,30 +153,23 @@ namespace MG.Extensions.Strings
 
 #if NET9_0_OR_GREATER
         /// <summary>
-        /// Gets an enumerator that iterates through the characters in the range.
+        /// Returns an enumerator that iterates through the characters in a <see cref="CharRange"/>.
         /// </summary>
-        /// <returns>
-        /// An enumerator that iterates through the characters in the range in ascending numerical order.
-        /// </returns>
-        public readonly IEnumerator<char> GetEnumerator()
-        {
-            return new Enumerator(_start, _end);
-        }
-        /// <inheritdoc/>
-        readonly IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        public readonly Enumerator GetEnumerator() => new Enumerator(this.Start, this.End);
 
-        private struct Enumerator : IEnumerator<char>
+        /// <summary>
+        /// Enumerates the characters in a <see cref="CharRange"/>.
+        /// </summary>
+        public ref struct Enumerator
         {
             private int _current;
-            private int _start;
-            private int _end;
+            private readonly int _start;
+            private readonly int _end;
 
+            /// <summary>
+            /// Gets the current character in the range.
+            /// </summary>
             public readonly char Current => (char)_current;
-            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-            readonly object IEnumerator.Current => this.Current;
 
             internal Enumerator(int start, int end)
             {
@@ -189,10 +179,11 @@ namespace MG.Extensions.Strings
                 _end = end;
             }
 
-            public void Dispose()
-            {
-                this = default;
-            }
+            /// <summary>
+            /// Moves to the next character in the range.
+            /// </summary>
+            /// <returns><see langword="true"/> if the enumerator was successfully moved to the next character;
+            /// otherwise, <see langword="false"/>.</returns>
             public bool MoveNext()
             {
                 int next = _current + 1;
@@ -204,6 +195,9 @@ namespace MG.Extensions.Strings
                 _current = next;
                 return true;
             }
+            /// <summary>
+            /// Resets the enumerator to the starting character.
+            /// </summary>
             public void Reset()
             {
                 _current = _start;

@@ -9,6 +9,7 @@ namespace MG.Extensions.Strings.Enumerators
     /// </summary>
     [DebuggerStepThrough]
     [StructLayout(LayoutKind.Auto)]
+    [DebuggerDisplay(@"\{Current = {Current}\}")]
     public ref struct SplitEnumerator
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

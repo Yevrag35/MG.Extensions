@@ -8,7 +8,7 @@ namespace MG.Extensions.Strings.Enumerators
     /// </summary>
     [DebuggerStepThrough]
     [StructLayout(LayoutKind.Auto)]
-    [DebuggerDisplay(@"\{{Chars}\}")]
+    [DebuggerDisplay(@"\{{Section}\}")]
     public readonly ref struct SplitEntry
     {
         /// <summary>

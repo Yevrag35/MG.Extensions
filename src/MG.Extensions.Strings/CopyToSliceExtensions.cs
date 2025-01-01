@@ -19,11 +19,7 @@ namespace MG.Extensions.Strings
         /// </param>
         /// <inheritdoc cref="CopyToSlice{T}(ReadOnlySpan{T}, Span{T}, ref int)" path="/exception"/>
         [DebuggerStepThrough]
-        public static void CopyToSlice(this string? value, Span<char> span,
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ref int position)
+        public static void CopyToSlice(this string? value, Span<char> span, ref int position)
         {
             CopyToSlice(readOnlySpan: value.AsSpan(), span, ref position);
         }
@@ -39,11 +35,7 @@ namespace MG.Extensions.Strings
         /// </param>
         /// <inheritdoc cref="CopyToSlice{T}(ReadOnlySpan{T}, Span{T}, ref int)" path="/exception"/>
         [DebuggerStepThrough]
-        public static void CopyToSlice<T>(this Span<T> value, Span<T> span,
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ref int position)
+        public static void CopyToSlice<T>(this Span<T> value, Span<T> span, ref int position)
         {
             CopyToSlice(readOnlySpan: value, span, ref position);
         }
@@ -62,11 +54,7 @@ namespace MG.Extensions.Strings
         ///     Thrown if the specified position is less than 0 or if copying the characters would exceed 
         ///     the length of the target span.
         /// </exception>
-        public static void CopyToSlice<T>(this ReadOnlySpan<T> readOnlySpan, Span<T> span,
-#if NET7_0_OR_GREATER
-            scoped
-#endif
-            ref int position)
+        public static void CopyToSlice<T>(this ReadOnlySpan<T> readOnlySpan, Span<T> span, ref int position)
         {
 #if NET6_0_OR_GREATER
             Guard.ThrowIfNegative(position);

@@ -2,6 +2,8 @@ using MG.Extensions.Guarding;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
+#nullable enable
+
 namespace MG.Extensions.Strings.Builders
 {
     /// <summary>
@@ -52,6 +54,7 @@ namespace MG.Extensions.Strings.Builders
         /// If this <see langword="true"/>, then this builder needs to be disposed 
         /// to return the buffer to the pool.
         /// </remarks>
+        [MemberNotNullWhen(true, nameof(_array))]
         public readonly bool IsRented => _isRented;
         /// <summary>
         /// Gets the number of characters written to the current builder.

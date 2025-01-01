@@ -46,14 +46,9 @@ namespace MG.Extensions.Strings
 
         private static void AdjustNumber<T>(ref T number) where T : INumber<T>, IMinMaxValue<T>
         {
-            if (T.MinValue.Equals(number))
-            {
-                number = T.MaxValue;
-            }
-            else
-            {
-                number = T.Abs(number);
-            }
+            number = T.MinValue.Equals(number)
+                ? T.MaxValue
+                : T.Abs(number);
         }
     }
 }

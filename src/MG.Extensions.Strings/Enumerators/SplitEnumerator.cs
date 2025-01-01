@@ -123,8 +123,10 @@ namespace MG.Extensions.Strings.Enumerators
             ref char c = ref Unsafe.AsRef(in value);
             unsafe
             {
-                void* pointer = Unsafe.AsPointer(ref c);
-                return new ReadOnlySpan<char>(pointer, 1);
+                fixed (char* pointer = &c)
+                {
+                    return new ReadOnlySpan<char>(pointer, 1);
+                }
             }
         }
 #endif

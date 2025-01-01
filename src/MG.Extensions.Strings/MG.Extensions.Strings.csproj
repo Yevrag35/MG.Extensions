@@ -16,7 +16,7 @@
 		<Title>MG String Extensions</Title>
 		<Authors>Mike Garvey</Authors>
 		<Company>Yevrag35, LLC.</Company>
-		<Copyright>Copyright (c) 2024 Yevrag35, LLC., Mike Garvey, and Contributors. All rights reserved.</Copyright>
+		<Copyright>Copyright (c) 2024-2025 Yevrag35, LLC., Mike Garvey, and Contributors. All rights reserved.</Copyright>
 		<Description>Providing String/Span-based extension methods.</Description>
 		<RepositoryUrl>https://github.com/Yevrag35/MG.Extensions.git</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
@@ -30,7 +30,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<AssemblyTitle>MG String Extensions - .NET 9</AssemblyTitle>
 		<Product>MG String Extensions - .NET 9</Product>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<AssemblyTitle>MG String Extensions - .NET 8</AssemblyTitle>
@@ -55,9 +55,6 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
 		<LangVersion>10</LangVersion>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
-		<LangVersion>preview</LangVersion>
-	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0'">
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
@@ -74,8 +71,8 @@
 		<PackageReference Include="System.Buffers" Version="4.5.1" />
 		<PackageReference Include="System.Memory" Version="4.5.5" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.0-rc.2.24473.5" />
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+		<PackageReference Include="Microsoft.Bcl.Memory" Version="9.0.0" />
 		<PackageReference Include="Nullable" Version="1.3.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

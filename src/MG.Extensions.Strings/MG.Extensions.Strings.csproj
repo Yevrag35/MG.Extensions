@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<AssemblyName>MG.Extensions.Strings</AssemblyName>
-		<AssemblyVersion>1.1.0</AssemblyVersion>
-		<FileVersion>1.1.0</FileVersion>
-		<InformationalVersion>1.1.0</InformationalVersion>
-		<Version>1.1.0</Version>
+		<AssemblyVersion>2.0.0</AssemblyVersion>
+		<FileVersion>2.0.0</FileVersion>
+		<InformationalVersion>2.0.0</InformationalVersion>
+		<Version>2.0.0</Version>
 		<Title>MG String Extensions</Title>
 		<Authors>Mike Garvey</Authors>
 		<Company>Yevrag35, LLC.</Company>
@@ -27,6 +28,11 @@
 		<PackageTags>String;Span;Char;Character;Extension;Builder</PackageTags>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<AssemblyTitle>MG String Extensions - .NET 10</AssemblyTitle>
+		<Product>MG String Extensions - .NET 10</Product>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<AssemblyTitle>MG String Extensions - .NET 9</AssemblyTitle>
 		<Product>MG String Extensions - .NET 9</Product>
@@ -35,14 +41,17 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<AssemblyTitle>MG String Extensions - .NET 8</AssemblyTitle>
 		<Product>MG String Extensions - .NET 8</Product>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
 		<AssemblyTitle>MG String Extensions - .NET 7</AssemblyTitle>
 		<Product>MG String Extensions - .NET 7</Product>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
 		<AssemblyTitle>MG String Extensions - .NET 6</AssemblyTitle>
 		<Product>MG String Extensions - .NET 6</Product>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 		<AssemblyTitle>MG String Extensions - .NET Standard 2.0</AssemblyTitle>
@@ -55,13 +64,15 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
 		<LangVersion>10</LangVersion>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0'">
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">
 		<Compile Remove="**\NETNext\**\*.cs" />
 		<None Include="**\NETNext\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Buffers\SpanStringBuilderOld-CoreOnly.cs" />
+	  <Compile Remove="Buffers\SpanStringBuilderOld.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,6 +101,8 @@
 
 	<ItemGroup>
 		<None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" Link="..\.pkg\LICENSE.txt" />
+		<None Include="Buffers\SpanStringBuilderOld-CoreOnly.cs" />
+		<None Include="Buffers\SpanStringBuilderOld.cs" />
 		<None Include="README.md" Pack="true" PackagePath="docs\" Link="..\.pkg\README.md" />
 	</ItemGroup>
 

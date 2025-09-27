@@ -1,7 +1,7 @@
 using MG.Extensions.Guarding;
 using System.Runtime.InteropServices;
 
-namespace MG.Extensions.Strings
+namespace MG.Extensions.Strings.Buffers
 {
     /// <summary>
     /// A read-only struct that represents a position and length range within a given span.

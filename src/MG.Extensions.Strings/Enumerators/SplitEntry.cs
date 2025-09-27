@@ -12,9 +12,10 @@ namespace MG.Extensions.Strings.Enumerators
     public readonly ref struct SplitEntry
     {
         /// <summary>
-        /// Gets the slice of characters before the separator.
+        /// Gets a value indicating whether the range is valid, defined as both the start and end values being zero.
         /// </summary>
-        public readonly ReadOnlySpan<char> Section;
+        public bool IsValid => Range is { Start: { Value: 0 } } and { End: { Value: 0 } };
+
         /// <summary>
         /// The range containing the inclusive start and exclusive end indexes of the entry.
         /// </summary>
@@ -32,10 +33,9 @@ namespace MG.Extensions.Strings.Enumerators
         /// </param>
         /// <param name="chars">The characters before the separator.</param>
         /// <param name="separator">The separator characters.</param>
-        internal SplitEntry(Range range, ReadOnlySpan<char> chars, ReadOnlySpan<char> separator)
+        internal SplitEntry(Range range, ReadOnlySpan<char> separator)
         {
             Range = range;
-            Section = chars;
             Separator = separator;
         }
 
@@ -47,24 +47,17 @@ namespace MG.Extensions.Strings.Enumerators
         /// </param>
         /// <param name="chars">When this method returns, contains the characters before the separator.</param>
         /// <param name="separator">When this method returns, contains the separator characters.</param>
-        public readonly void Deconstruct(out Range range, out ReadOnlySpan<char> chars, out ReadOnlySpan<char> separator)
+        public readonly void Deconstruct(out Range range, out ReadOnlySpan<char> separator)
         {
             range = Range;
-            chars = Section;
             separator = Separator;
         }
 
         /// <summary>
         /// An empty <see cref="SplitEntry"/> instance with empty character and separator spans.
         /// </summary>
-        public static SplitEntry Empty => new SplitEntry(Range.All, ReadOnlySpan<char>.Empty, ReadOnlySpan<char>.Empty);
+        public static SplitEntry Empty => new SplitEntry(Range.All, ReadOnlySpan<char>.Empty);
 
-        /// <summary>
-        /// Implicitly converts a <see cref="SplitEntry"/> to a <see cref="ReadOnlySpan{T}"/>, returning 
-        /// its characters before the separator.
-        /// </summary>
-        /// <param name="entry">The split entry to convert.</param>
-        public static implicit operator ReadOnlySpan<char>(SplitEntry entry) => entry.Section;
         /// <summary>
         /// Implicitly converts a <see cref="SplitEntry"/> to a <see cref="Range"/>, returning
         /// a range representing the inclusive start and exclusive end indexes of the entry.

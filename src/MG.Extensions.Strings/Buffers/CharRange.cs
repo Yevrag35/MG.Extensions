@@ -1,11 +1,12 @@
 using MG.Extensions.Guarding;
+
 #if NET9_0_OR_GREATER
 using System.Collections;
 #endif
 using System.Runtime.InteropServices;
 
 #pragma warning disable IDE0009 // Member access should be qualified.
-namespace MG.Extensions.Strings
+namespace MG.Extensions.Strings.Buffers
 {
     /// <summary>
     /// A struct that represents a numerical range of characters.

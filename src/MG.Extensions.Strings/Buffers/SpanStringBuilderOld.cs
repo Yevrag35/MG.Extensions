@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace MG.Extensions.Strings.Builders
+namespace MG.Extensions.Strings.Buffers
 {
     /// <summary>
     /// A ref struct that provides an efficient way to build strings using expandable 
@@ -15,7 +15,7 @@ namespace MG.Extensions.Strings.Builders
     /// </remarks>
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay(@"\{AsSpan()\}")]
-    public ref partial struct SpanStringBuilder
+    public ref partial struct SpanStringBuilderOld
     {
         const int MULTIPLE = 128;
         const int INCREMENT = MULTIPLE - 1;
@@ -62,13 +62,13 @@ namespace MG.Extensions.Strings.Builders
         public readonly int Length => _position;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SpanStringBuilder"/> with the specified
+        /// Initializes a new instance of <see cref="SpanStringBuilderOld"/> with the specified
         /// minimum initial capacity.
         /// </summary>
         /// <param name="minimumCapacity">
         ///     The minimum capacity for the internal buffer the builder should allocate.
         /// </param>
-        public SpanStringBuilder(int minimumCapacity)
+        public SpanStringBuilderOld(int minimumCapacity)
         {
             AdjustCapacity(ref minimumCapacity);
             char[] array = ArrayPool<char>.Shared.Rent(minimumCapacity);
@@ -78,7 +78,7 @@ namespace MG.Extensions.Strings.Builders
             _position = 0;
         }
         /// <summary>
-        /// Initializes a new instance of <see cref="SpanStringBuilder"/> with the specified
+        /// Initializes a new instance of <see cref="SpanStringBuilderOld"/> with the specified
         /// buffer to use internally.
         /// </summary>
         /// <param name="initialBuffer">
@@ -89,7 +89,7 @@ namespace MG.Extensions.Strings.Builders
         /// </para>
         /// </param>
         [DebuggerStepThrough]
-        public SpanStringBuilder(Span<char> initialBuffer)
+        public SpanStringBuilderOld(Span<char> initialBuffer)
         {
             _array = null;
             _isRented = false;
@@ -99,7 +99,7 @@ namespace MG.Extensions.Strings.Builders
 
         /// <summary>
         /// Allocates a new <see cref="string"/> from the characters appended to the builder and disposes this
-        /// <see cref="SpanStringBuilder"/>.
+        /// <see cref="SpanStringBuilderOld"/>.
         /// </summary>
         /// <remarks>
         ///     Use <see cref="ToString"/> if you want to construct additional strings from the same builder.
@@ -116,9 +116,9 @@ namespace MG.Extensions.Strings.Builders
 
         /// <inheritdoc cref="StringBuilder.Append(char)" path="/*[not(self::returns)]"/>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
-        public SpanStringBuilder Append(char value)
+        public SpanStringBuilderOld Append(char value)
         {
             this.EnsureCapacity(1);
             _span[_position++] = value;
@@ -127,9 +127,9 @@ namespace MG.Extensions.Strings.Builders
 
         /// <inheritdoc cref="StringBuilder.Append(char, int)" path="/*[not(self::returns)]"/>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
-        public SpanStringBuilder Append(char value, int count)
+        public SpanStringBuilderOld Append(char value, int count)
         {
             this.EnsureCapacity(count);
 
@@ -144,10 +144,10 @@ namespace MG.Extensions.Strings.Builders
         /// Appends the specified read-only character span to this instance.
         /// </summary>
         /// <returns>
-        /// The same instance of this <see cref="SpanStringBuilder"/> for chaining.
+        /// The same instance of this <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder Append(
+        public SpanStringBuilderOld Append(
 #if NET7_0_OR_GREATER
             scoped
 #endif
@@ -168,13 +168,13 @@ namespace MG.Extensions.Strings.Builders
 
         /// <summary>
         /// Appends the default line terminator to the end of the current
-        /// <see cref="SpanStringBuilder"/> instance.
+        /// <see cref="SpanStringBuilderOld"/> instance.
         /// </summary>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder AppendLine()
+        public SpanStringBuilderOld AppendLine()
         {
             this.EnsureCapacity(NEW_LINE_LENGTH);
             NEW_LINE.CopyToSlice(_span, ref _position);
@@ -182,13 +182,13 @@ namespace MG.Extensions.Strings.Builders
         }
         /// <summary>
         /// Appends a copy of the specified <see cref="string"/> followed by the default line
-        /// terminator to the end of the current <see cref="SpanStringBuilder"/> instance.
+        /// terminator to the end of the current <see cref="SpanStringBuilderOld"/> instance.
         /// </summary>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder AppendLine(
+        public SpanStringBuilderOld AppendLine(
 #if NET7_0_OR_GREATER
             scoped
 #endif
@@ -253,11 +253,11 @@ namespace MG.Extensions.Strings.Builders
         /// <param name="index">The index at which to insert the character.</param>
         /// <param name="c">The character to insert.</param>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
         [DebuggerStepThrough]
-        public SpanStringBuilder Insert(int index, char c)
+        public SpanStringBuilderOld Insert(int index, char c)
         {
             return this.Insert(index, c, 1);
         }
@@ -268,10 +268,10 @@ namespace MG.Extensions.Strings.Builders
         /// <param name="c">The character to insert.</param>
         /// <param name="count">The number of times <paramref name="c"/> is inserted.</param>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder Insert(int index, char c, int count)
+        public SpanStringBuilderOld Insert(int index, char c, int count)
         {
             this.EnsureCapacity(count);
             int remaining = _position - index;
@@ -288,10 +288,10 @@ namespace MG.Extensions.Strings.Builders
         /// <param name="index">The index at which to insert the value.</param>
         /// <param name="value">The span of characters to insert.</param>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <inheritdoc cref="EnsureCapacity(int)" path="/exception"/>
-        public SpanStringBuilder Insert(int index,
+        public SpanStringBuilderOld Insert(int index,
 #if NET7_0_OR_GREATER
             scoped
 #endif
@@ -318,12 +318,12 @@ namespace MG.Extensions.Strings.Builders
         /// <param name="startIndex">The zero-based index the removal starts from.</param>
         /// <param name="length">The number of characters that will be removed.</param>
         /// <returns>
-        /// This same instance of <see cref="SpanStringBuilder"/> for chaining.
+        /// This same instance of <see cref="SpanStringBuilderOld"/> for chaining.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
         ///     <paramref name="startIndex"/> and/or <paramref name="length"/> are out of range.
         /// </exception>
-        public SpanStringBuilder Remove(int startIndex, int length)
+        public SpanStringBuilderOld Remove(int startIndex, int length)
         {
             int position = _position;
             int newLength = startIndex + length;
@@ -405,7 +405,7 @@ namespace MG.Extensions.Strings.Builders
         }
 
         /// <summary>
-        /// Disposes of this <see cref="SpanStringBuilder"/> instance, returning the 
+        /// Disposes of this <see cref="SpanStringBuilderOld"/> instance, returning the 
         /// buffer to the <see cref="ArrayPool{T}"/> if it was rented.
         /// </summary>
         public void Dispose()

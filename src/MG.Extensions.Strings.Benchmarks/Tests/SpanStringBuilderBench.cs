@@ -8,33 +8,21 @@ namespace MG.Extensions.Strings.Benchmarks
     public class SpanStringBuilderBench
     {
         private string[] _strings = [];
+        private StringBuilder _builder;
         private int _cap;
 
         [Benchmark(Baseline = true)]
         public void StringBuilder_AppendAndToString()
         {
-            StringBuilder x = new(_cap);
             foreach (string s in _strings)
             {
-                _ = x.Append(s);
+                _ = _builder.Append(s);
             }
 
 
-
-            //_ = x.ToString();
+            _ = _builder.ToString();
+            _builder.Clear();
         }
-
-        //[Benchmark]
-        //public void SpanBuilder_AppendAndToString()
-        //{
-        //    SpanStringBuilder x = new(stackalloc char[_cap]);
-        //    foreach (string s in _strings)
-        //    {
-        //        x = x.Append(s);
-        //    }
-
-        //    _ = x.ToString();
-        //}
 
         [Benchmark]
         public void SpanBuilder_AppendAndBuild()
@@ -42,10 +30,10 @@ namespace MG.Extensions.Strings.Benchmarks
             SpanStringBuilder x = new(stackalloc char[_cap]);
             foreach (string s in _strings)
             {
-                x = x.Append(s);
+                x.Append(s);
             }
 
-            //_ = x.Build();
+            _ = x.Build();
         }
 
         [GlobalSetup]
@@ -53,6 +41,7 @@ namespace MG.Extensions.Strings.Benchmarks
         {
             //_cap = 79036;
             _cap = 597;
+            _builder = new(_cap);
             _strings = [ 
             "j5$#A",
             "fm9%XAydiHqJ5x",

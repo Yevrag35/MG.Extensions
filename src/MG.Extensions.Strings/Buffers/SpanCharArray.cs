@@ -1,4 +1,5 @@
 using MG.Extensions.Guarding;
+using MG.Extensions.Strings.Buffers;
 using System.Runtime.InteropServices;
 
 namespace MG.Extensions.Strings.Builders
@@ -129,9 +130,9 @@ namespace MG.Extensions.Strings.Builders
             int count = StringExtensions.Count(value, splitBy) + 1;
             this.EnsureCapacity(count);
 
-            foreach (ReadOnlySpan<char> section in value.SpanSplit(splitBy))
+            foreach (Range range in value.SpanSplit(splitBy))
             {
-                this.AddSegment(section);
+                this.AddSegment(value[range]);
             }
 
             return this;
@@ -366,9 +367,9 @@ namespace MG.Extensions.Strings.Builders
 
             SpanCharArray array = new(count, separator);
 
-            foreach (ReadOnlySpan<char> section in value.SpanSplit(in separator))
+            foreach (Range section in value.SpanSplit(in separator))
             {
-                array.AddSegment(section);
+                array.AddSegment(value[section]);
             }
 
             return array;

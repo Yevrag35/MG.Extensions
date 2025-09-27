@@ -77,7 +77,12 @@ namespace MG.Extensions.Strings.Enumerators
             return hasNext;
         }
 
-        private static bool FindIndexAndSplit(ReadOnlySpan<char> chars, ReadOnlySpan<char> splitBy, in int originalLength, ref ReadOnlySpan<char> remainingText, ref SplitEntry current)
+        private static bool FindIndexAndSplit(
+            ReadOnlySpan<char> chars,
+            ReadOnlySpan<char> splitBy,
+            in int originalLength,
+            ref ReadOnlySpan<char> remainingText,
+            ref SplitEntry current)
         {
             int startAt = originalLength - chars.Length;
             int index = chars.IndexOfAny(splitBy);
@@ -87,13 +92,13 @@ namespace MG.Extensions.Strings.Enumerators
             {
                 Range range = Range.StartAt(startAt);
                 remainingText = ReadOnlySpan<char>.Empty;
-                current = new(range, chars, splitBy);
+                current = new(range, splitBy);
                 hasNext = false;
             }
             else
             {
                 Range range = new(startAt, startAt + index + 1);
-                current = new(range, chars.Slice(0, index), splitBy);
+                current = new(range, splitBy);
 
                 remainingText = (uint)index + 1u < (uint)chars.Length
                     ? chars.Slice(index + 1)

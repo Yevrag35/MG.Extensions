@@ -1,21 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 	
   <PropertyGroup>
 	<AssemblyName>MG.Extensions.Guarding</AssemblyName>
-	<AssemblyVersion>1.1.0</AssemblyVersion>
-	<FileVersion>1.1.0</FileVersion>
-	<InformationalVersion>1.1.0</InformationalVersion>
-	<Version>1.1.0</Version>
+	<AssemblyVersion>2.0.0</AssemblyVersion>
+	<FileVersion>2.0.0</FileVersion>
+	<InformationalVersion>2.0.0</InformationalVersion>
+	<Version>2.0.0</Version>
 	<Title>MG Guarding</Title>
 	<Authors>Mike Garvey</Authors>
 	<Company>Yevrag35, LLC.</Company>
-	<Copyright>Copyright (c) 2024 Yevrag35, LLC., Mike Garvey, and Contributors. All rights reserved.</Copyright>
+	<Copyright>Copyright (c) 2024-2025 Yevrag35, LLC., Mike Garvey, and Contributors. All rights reserved.</Copyright>
 	<Description>Providing methods for guarding against null-values, invalid ranges, types, etc.</Description>
 	<RepositoryUrl>https://github.com/Yevrag35/MG.Extensions.git</RepositoryUrl>
 	<RepositoryType>Git</RepositoryType>
@@ -25,10 +27,13 @@
 	<PackageReadmeFile>docs\README.md</PackageReadmeFile>
 	<PackageTags>Guard;Null;empty;Whitespace;check;range;type;invalid</PackageTags>
   </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<AssemblyTitle>MG Guarding - .NET 10</AssemblyTitle>
+		<Product>MG Guarding - .NET 10</Product>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
 		<AssemblyTitle>MG Guarding - .NET 9</AssemblyTitle>
 		<Product>MG Guarding - .NET 9</Product>
-		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 	  <AssemblyTitle>MG Guarding - .NET 8</AssemblyTitle>
@@ -50,8 +55,8 @@
 		<AssemblyTitle>MG Guarding - .NET Standard 2.1</AssemblyTitle>
 		<Product>MG Guarding - .NET Standard 2.1</Product>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
-		<LangVersion>preview</LangVersion>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0' Or '$(TargetFramework)' == 'net10.0'">
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
 	  <LangVersion>8</LangVersion>

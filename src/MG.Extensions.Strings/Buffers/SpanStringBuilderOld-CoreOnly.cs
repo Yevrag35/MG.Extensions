@@ -20,7 +20,7 @@ namespace MG.Extensions.Strings.Builders
 #endif
         ;
 
-    public ref partial struct SpanStringBuilder
+    public ref partial struct SpanStringBuilderOld
     {
 #if NET7_0_OR_GREATER
         /// <summary>

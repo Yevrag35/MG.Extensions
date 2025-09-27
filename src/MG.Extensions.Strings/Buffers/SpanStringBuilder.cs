@@ -1,4 +1,5 @@
 ﻿using MG.Extensions.Guarding;
+using MG.Extensions.Strings.Unmanaged;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -138,6 +139,7 @@ namespace MG.Extensions.Strings.Buffers
             _buffer.Slice(pos, count).Fill(value);
             pos += count;
         }
+#if NET8_0_OR_GREATER
         /// <summary>
         /// Appends the string representation of the specified enumeration value to the current instance.
         /// </summary>
@@ -147,7 +149,7 @@ namespace MG.Extensions.Strings.Buffers
         /// <param name="enumValue">The enumeration value to append.</param>
         public void Append<TEnum>(TEnum enumValue) where TEnum : unmanaged, Enum
         {
-            scoped RentedBuffer<char> buffer = new(stackalloc char[DEFAULT_CAPACITY / 2]);
+            RentedBuffer<char> buffer = new(stackalloc char[DEFAULT_CAPACITY / 2]);
             try
             {
                 int written = 0;
@@ -164,6 +166,7 @@ namespace MG.Extensions.Strings.Buffers
                 buffer.Dispose();
             }
         }
+#endif
         /// <summary>
         /// Appends the string representation of the specified <see cref="Guid"/> to the current buffer.
         /// </summary>
@@ -180,32 +183,52 @@ namespace MG.Extensions.Strings.Buffers
             this.EnsureCapacity(length);
 
             var slice = _buffer.Slice(_position);
-            _ = value.TryFormat(slice, out int written);
+
+#if NETSTANDARD2_0
+            GuidFormatting.TryFormat(value, slice, out int written, format);
+#else
+            _ = value.TryFormat(slice, out int written, format: format);
+#endif
             _position += written;
 
             Debug.Assert(!slice.Slice(0, written).Contains(default), "This is where you're messing up!");
         }
 
+#if NET7_0_OR_GREATER
         /// <summary>
-        /// Appends the string representation of a specified <typeparamref name="T"/> value to this instance.
+        /// Appends the specified binary integer value to the current buffer, using the provided format provider if
+        /// specified.
         /// </summary>
-        /// <typeparam name="T">The type of <see cref="INumber{TSelf}"/> being appended.</typeparam>
-        /// <param name="number">The number to append.</param>
-        /// <param name="format">The format to use.</param>
-        /// <param name="provider">The format provider to use.</param>
-        /// <exception cref="OutOfMemoryException"/>
+        /// <typeparam name="T">
+        /// The type of the binary integer to append.
+        /// </typeparam>
+        /// <param name="number">The binary integer value to append to the buffer.</param>
+        /// <param name="provider">An optional format provider that supplies culture-specific formatting information. If null, the default
+        /// formatting is used.</param>
         public void Append<T>(T number, IFormatProvider? provider = null) where T : unmanaged, IBinaryInteger<T>, IMinMaxValue<T>
         {
             int length = number.GetLength();
             this.EnsureCapacity(length);
             _position = number.CopyToSlice(_buffer, _position, default, provider);
         }
+#endif
+        /// <summary>
+        /// Appends the specified 32-bit signed integer value to the current buffer.
+        /// </summary>
+        /// <param name="value">The 32-bit signed integer value to append to the buffer.</param>
+        public void Append(int value)
+        {
+            int length = value.GetLength();
+            this.EnsureCapacity(length);
+
+            _position = value.CopyToSlice(_buffer, _position);
+        }
 
         /// <summary>
         /// Appends the characters from the specified <see cref="ReadOnlySpan{T}"/> to the current instance.
         /// </summary>
         /// <param name="value">The span containing the characters to append.</param>
-        public void Append(scoped ReadOnlySpan<char> value)
+        public void Append(ReadOnlySpan<char> value)
         {
             if (value.IsEmpty)
             {
@@ -216,6 +239,7 @@ namespace MG.Extensions.Strings.Buffers
             _position = value.CopyToSlice(_buffer, _position);
         }
 
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Appends the string representation of a specified <see cref="ISpanFormattable"/> value to this instance.
         /// </summary>
@@ -229,6 +253,8 @@ namespace MG.Extensions.Strings.Buffers
             this.EnsureCapacity(maxLength);
             _position = formattable.CopyToSlice(_buffer, _position, format, provider);
         }
+#endif
+#if NET9_0_OR_GREATER
         /// <summary>
         /// Appends the result of the provided <see cref="Action{T, TState}"/> to the current instance.
         /// </summary>
@@ -236,13 +262,14 @@ namespace MG.Extensions.Strings.Buffers
         /// <param name="length">The number of characters to be written.</param>
         /// <param name="state">The state passed to the <paramref name="spanAction"/>.</param>
         /// <param name="spanAction">The action that writes to the span.</param>
-        public void Append<T>(int length, scoped T state, Action<Span<char>, T> spanAction) where T : allows ref struct
+        public void Append<T>(int length, T state, Action<Span<char>, T> spanAction) where T : allows ref struct
         {
             this.EnsureCapacity(length);
             ref int pos = ref _position;
             spanAction(_buffer.Slice(pos, length), state);
             pos += length;
         }
+#endif
         /// <summary>
         /// Appends the result of the provided <see cref="Action{T, TState}"/> to the current instance.
         /// </summary>
@@ -250,13 +277,17 @@ namespace MG.Extensions.Strings.Buffers
         /// <param name="length">The number of characters to be written.</param>
         /// <param name="state">The state passed to the <paramref name="spanAction"/>.</param>
         /// <param name="spanAction">The action that writes to the span.</param>
-        internal unsafe void Append<T>(int length, scoped T state, delegate*<Span<char>, T, void> spanAction) where T : allows ref struct
+        internal unsafe void Append<T>(int length, T state, delegate*<Span<char>, T, void> spanAction)
+#if NET9_0_OR_GREATER
+            where T : allows ref struct
+#endif
         {
             this.EnsureCapacity(length);
             ref int pos = ref _position;
             spanAction(_buffer.Slice(pos, length), state);
             pos += length;
         }
+#if NET9_0_OR_GREATER
         /// <summary>
         /// Appends the result of the provided delegate to the current instance.
         /// </summary>
@@ -264,12 +295,13 @@ namespace MG.Extensions.Strings.Buffers
         /// <param name="maxLength">The maximum number of characters that may be written.</param>
         /// <param name="state">The state passed to the <paramref name="spanFunc"/>.</param>
         /// <param name="spanFunc">The delegate that writes to the span.</param>
-        public void Append<T>(int maxLength, scoped T state, Func<Span<char>, T, int> spanFunc) where T : allows ref struct
+        public void Append<T>(int maxLength, T state, Func<Span<char>, T, int> spanFunc)where T : allows ref struct
         {
             this.EnsureCapacity(maxLength);
             int written = spanFunc(_buffer.Slice(_position, maxLength), state);
             _position += written;
         }
+#endif
         /// <summary>
         /// Appends a formatted value to the current buffer using a user-provided callback function.
         /// </summary>
@@ -281,7 +313,10 @@ namespace MG.Extensions.Strings.Buffers
         /// <param name="state">A state object that is passed to the callback function to provide additional context or data.</param>
         /// <param name="funcPtr">A pointer to a callback function that writes the formatted value to the provided <see cref="Span{T}"/>. The
         /// function must return the number of characters written.</param>
-        internal unsafe void Append<T>(int maxLength, scoped T state, delegate*<Span<char>, T, int> funcPtr) where T : allows ref struct
+        internal unsafe void Append<T>(int maxLength, T state, delegate*<Span<char>, T, int> funcPtr)
+#if NET9_0_OR_GREATER
+            where T : allows ref struct
+#endif
         {
             this.EnsureCapacity(maxLength);
             var slice = _buffer.Slice(_position, maxLength);
@@ -290,7 +325,10 @@ namespace MG.Extensions.Strings.Buffers
 
             Debug.Assert(!slice.Slice(0, written).Contains(default), "This is where you're messing up.");
         }
-        internal unsafe void Append<T>(int maxLength, scoped ref T state, delegate*<Span<char>, ref T, int> funcPtr) where T : allows ref struct
+        internal unsafe void Append<T>(int maxLength, ref T state, delegate*<Span<char>, ref T, int> funcPtr)
+#if NET9_0_OR_GREATER
+            where T : allows ref struct
+#endif
         {
             this.EnsureCapacity(maxLength);
             var slice = _buffer.Slice(_position, maxLength);
@@ -324,7 +362,7 @@ namespace MG.Extensions.Strings.Buffers
         /// performed efficiently using inlining to minimize overhead.</remarks>
         /// <param name="values">An array of <see cref="ReadOnlySpan{T}"/> of characters to append. Each span in the array is appended in order.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AppendChars(params ReadOnlySpan<char> values)
+        public void AppendChars(ReadOnlySpan<char> values)
         {
             this.Append(values);
         }
@@ -341,7 +379,7 @@ namespace MG.Extensions.Strings.Buffers
         /// Appends a span of characters followed by a new line to the <see cref="SpanStringBuilder"/>.
         /// </summary>
         /// <param name="value">The span of characters to append.</param>
-        public void AppendLine(scoped ReadOnlySpan<char> value)
+        public void AppendLine(ReadOnlySpan<char> value)
         {
             this.EnsureCapacity(value.Length + s_newLineLength);
 
@@ -385,13 +423,6 @@ namespace MG.Extensions.Strings.Buffers
         }
 
         /// <summary>
-        /// Returns the backing <see cref="Span{T}"/> of the current buffer.
-        /// </summary>
-        internal readonly Span<char> GetBackingSpan()
-        {
-            return _buffer.Buffer;
-        }
-        /// <summary>
         /// Clears all data from the builder and resets the length to <c>0</c>.
         /// </summary>
         /// <remarks>This method removes all elements from the underlying buffer and sets the position to zero. After
@@ -401,22 +432,6 @@ namespace MG.Extensions.Strings.Buffers
         {
             _position = 0;
         }
-        ///// <summary>
-        ///// Advances the current position by the specified length and returns the updated position.
-        ///// </summary>
-        ///// <remarks>This method updates the internal position by adding the specified <paramref name="length"/> to it.
-        ///// Ensure that <paramref name="length"/> is non-negative to avoid exceptions.</remarks>
-        ///// <param name="length">The number of units to advance the position. Must be greater than or equal to 0.</param>
-        ///// <returns>The updated position after advancing by the specified length.</returns>
-        ///// <exception cref="ArgumentOutOfRangeException"/>
-        //public int AdvancePosition(int length)
-        //{
-        //	ArgumentOutOfRangeException.ThrowIfNegative(length);
-        //	Debug.Assert(length >= 0);
-        //	ref int pos = ref _position;
-        //	pos += length;
-
-        //	return pos;
         //}
         /// <summary>
         /// Copies the contents of this builder to a destination span.
@@ -458,11 +473,11 @@ namespace MG.Extensions.Strings.Buffers
             return _buffer.Slice(start, length);
         }
         /// <summary>
-        /// Returns a slice of the current buffer starting at the specified starting and ending indexes.
+        /// Returns a read-only span of characters representing the segment defined by the specified position.
         /// </summary>
-        /// <param name="start">The starting index of the slice.</param>
-        /// <param name="length">The inclusive ending index which ends the slice.</param>
-        /// <returns>A <see cref="ReadOnlySpan{T}"/> representing the specified slice.</returns>
+        /// <param name="position">The position that defines the start and end of the segment to retrieve. Must specify a valid range within
+        /// the underlying buffer.</param>
+        /// <returns>A read-only span of characters corresponding to the segment indicated by <paramref name="position"/>.</returns>
         public readonly ReadOnlySpan<char> GetSegment(SpanPosition position)
         {
             return _buffer[position.ToRange()];
@@ -504,7 +519,8 @@ namespace MG.Extensions.Strings.Buffers
         /// The zero-based index of the first occurrence of the character, or -1 if the character is not found within the specified range.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if <paramref name="startIndex"/> is less than 0 or greater than or equal to the length of the span, or if <paramref name="count"/> is less than 0 or exceeds the number of characters from <paramref name="startIndex"/> to the end of the buffer.
+        /// Thrown if <paramref name="startIndex"/> is less than 0 or greater than or equal to the length of the span, or if <paramref name="count"/> is less 
+        /// than 0 or exceeds the number of characters from <paramref name="startIndex"/> to the end of the buffer.
         /// </exception>
         [DebuggerStepThrough]
         public readonly int IndexOf(char value, int startIndex, int count)
@@ -546,7 +562,7 @@ namespace MG.Extensions.Strings.Buffers
         /// </summary>
         /// <param name="index">The zero-based index where the characters will be inserted.</param>
         /// <param name="value">The span of characters to insert.</param>
-        public void Insert(int index, scoped ReadOnlySpan<char> value)
+        public void Insert(int index, ReadOnlySpan<char> value)
         {
             if (value.IsEmpty)
             {
@@ -559,19 +575,6 @@ namespace MG.Extensions.Strings.Buffers
             value.CopyTo(_buffer.Slice(index));
 
             _position += value.Length;
-        }
-
-        public void OverlapAppend(int index, scoped ReadOnlySpan<char> value)
-        {
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, (uint)_position, nameof(index));
-            int newEnd = index + value.Length;               // correct end-of-data after the write
-            int growth = newEnd - _position;                 // how much we extend past current end
-
-            if (growth > 0)
-                this.EnsureCapacity(growth);                      // EnsureCapacity(additionalBeyondPosition)
-
-            value.CopyTo(_buffer.Slice(index));
-            _position = newEnd; // Always overwrite the position to the new end
         }
 
         /// <summary>

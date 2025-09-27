@@ -246,5 +246,34 @@ namespace MG.Extensions.Guarding
                    paramName));
             }
         }
+        /// <summary>
+        /// Throws an exception if the specified value is less than or equal to zero.
+        /// </summary>
+        /// <param name="value">The integer value to validate. Must be greater than zero.</param>
+        /// <param name="paramName">The name of the parameter being validated. Used in the exception message if an error is thrown. Optional.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="value"/> is less than or equal to zero.</exception>
+        public static void ThrowIfNegativeOrZero(int value,
+#if NET6_0_OR_GREATER
+            [CallerArgumentExpression(nameof(value))]
+#endif
+        string? paramName = null)
+        {
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value, paramName);
+#else
+            if (value <= 0)
+            {
+                string format = !string.IsNullOrEmpty(paramName)
+                    ? "{1} ('{0}') must be a non-negative and non-zero value."
+                    : "('{0}') must be a non-negative and non-zero value.";
+
+                throw new ArgumentOutOfRangeException(paramName, string.Format(
+                   provider: CultureInfo.CurrentCulture,
+                   format,
+                   value,
+                   paramName));
+            }
+#endif
+        }
     }
 }

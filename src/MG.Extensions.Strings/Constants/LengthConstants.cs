@@ -1,96 +1,108 @@
-namespace MG.Extensions.Strings
+namespace MG.Extensions
 {
     /// <summary>
-    /// A <see langword="static"/> class containing constants for the maximum character lengths of various 
-    /// numerical types.
+    /// Provides constant values for various length constraints.
     /// </summary>
     public static class LengthConstants
     {
-        // NUMERICAL LENGTHS
         /// <summary>
-        /// Maximum character length of a <see cref="byte"/>.
+        /// Maximum length for a byte value.
         /// </summary>
         public const int BYTE_MAX = 3;
+
         /// <summary>
-        /// Maximum character length of a <see cref="short"/>.
-        /// </summary>
-        public const int SHORT_MAX = 6;
-        /// <summary>
-        /// Maximum character length of a <see cref="int"/>.
+        /// Maximum length for an integer value.
         /// </summary>
         public const int INT_MAX = 11;
+
         /// <summary>
-        /// Maximum character length of a <see cref="long"/>.
+        /// Maximum length for a long value.
         /// </summary>
         public const int LONG_MAX = 20;
+
         /// <summary>
-        /// Maximum character length of a <see cref="uint"/>.
+        /// Maximum length for an unsigned integer value.
         /// </summary>
         public const int UINT_MAX = INT_MAX - 1;
+
         /// <summary>
-        /// Maximum character length of a <see cref="ulong"/>.
+        /// Maximum length for an unsigned long value.
         /// </summary>
+        /// <value><c>20</c></value>
         public const int ULONG_MAX = LONG_MAX;
+
         /// <summary>
-        /// Maximum character length of a <see cref="double"/>.
+        /// Maximum length for a double value.
         /// </summary>
-        public const int DOUBLE_MAX = 24;
+        public const int DOUBLE_MAX = 24;    // double.MinValue.ToString().Length
+
         /// <summary>
-        /// Maximum character length of a <see cref="decimal"/>.
+        /// Maximum length for a decimal value.
         /// </summary>
         public const int DECIMAL_MAX = 30;
-#if NET7_0_OR_GREATER
+
         /// <summary>
-        /// Maximum character length of an <see cref="Int128"/>.
+        /// Maximum length for a 128-bit integer value.
         /// </summary>
         public const int INT128_MAX = 40;
-#endif
 
         /// <summary>
-        /// The maximum number of digits in a BigInteger struct.
-        /// </summary>
-        /// <remarks>
-        /// The largest big integer is <c>2^68,685,922,272</c>. The following math can show
-        /// the number of digits in this number:
-        /// <para>
-        /// The value of <c>Math.Log(2)</c> is approximately <c>0.30103</c>.
-        /// </para>
-        /// <para>
-        /// Number of digits is roughly <c>[68,685,922,272×0.30103]+1</c>
-        /// </para>
-        /// <para>
-        /// Number of digits is roughly <c>[20,656,128,818.57]+1</c>
-        /// </para>
-        /// <para>
-        /// Number of digits is roughly <c>20,656,128,819</c>
-        /// </para>
-        /// </remarks>
-        public const long BIG_INT_MAX = 20_656_128_819;
-        /// <summary>
-        /// Maximum character length of a <see cref="float"/>.
-        /// </summary>
-        /// <remarks>
-        /// Equivalent to:
-        /// <para><c>float.MinValue.ToString("N").Length</c></para> ...which includes 2 decimal places.
-        /// </remarks>
-        public const int FLOAT_MAX = 55;
-
-        // GUID LENGTHS
-        /// <summary>
-        /// Maximum character length of a <see cref="Guid"/> in the "B" or "P" formats.
+        /// Length of a GUID in 'B' or 'P' format.
         /// </summary>
         public const int GUID_FORM_B_OR_P = 38;
+
         /// <summary>
-        /// Maximum character length of a <see cref="Guid"/> in the "D" format.
+        /// Length of a GUID in 'N' format.
         /// </summary>
         public const int GUID_FORM_N = 32;
+
         /// <summary>
-        /// Maximum character length of a <see cref="Guid"/> in the "D" format.
+        /// Length of a GUID in 'D' format.
         /// </summary>
         public const int GUID_FORM_D = 36;
+
         /// <summary>
-        /// Maximum character length of a <see cref="Guid"/> in the "X" format.
+        /// Length of a GUID in 'X' format.
         /// </summary>
         public const int GUID_FORM_X = 68;
+
+        /// <summary>
+        /// Gets the length of a GUID based on the specified format character.
+        /// </summary>
+        /// <param name="format">The format character ('B', 'P', 'N', 'D', or 'X').</param>
+        /// <returns>The length of the GUID in the specified format.</returns>
+        /// <inheritdoc cref="GetGuidLengthCore(char)" path="/exception"/>
+        public static int GetGuidLength(char format)
+        {
+            return GetGuidLengthCore(format);
+        }
+        /// <summary>
+        /// Gets the length of a GUID based on the specified read-only span consisting of a single character.
+        /// </summary>
+        /// <param name="format">The read-only span that contains the single format character.</param>
+        /// <returns><inheritdoc cref="GetGuidLength(char)"/></returns>
+        /// <exception cref="ArgumentException">Thrown when the format is not a single character.</exception>
+        /// <inheritdoc cref="GetGuidLengthCore(char)" path="/exception"/>
+        public static int GetGuidLength(ReadOnlySpan<char> format)
+        {
+            return format.Length switch
+            {
+                0 => GUID_FORM_D, // Default format
+                1 => GetGuidLengthCore(format[0]),
+                _ => throw new ArgumentException("GUID formats must be only 1 character in length.", nameof(format)),
+            };
+        }
+        /// <exception cref="FormatException">Thrown when the format character is invalid.</exception>
+        private static int GetGuidLengthCore(char format)
+        {
+            return format switch
+            {
+                'B' or 'P' or 'b' or 'p' => GUID_FORM_B_OR_P,
+                'N' or 'n' => GUID_FORM_N,
+                'D' or 'd' => GUID_FORM_D,
+                'X' or 'x' => GUID_FORM_X,
+                _ => throw new FormatException($"Invalid GUID format specified -> {format}"),
+            };
+        }
     }
 }
